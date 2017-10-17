@@ -1,4 +1,4 @@
-# auto-change-description: JSON Auto Change Description
+# auto-change-description
 
 This simple library compares two JSONs and lists the differences found as changes.
 
@@ -7,6 +7,20 @@ The library checks for created, deleted or modified plain attributes. This is do
 Array attributes are treated as plain attributes and compared using [deep-equal](https://www.npmjs.com/package/deep-equal). If arrays contain any objects or other arrays, those are not separately considered.
 
 Objects are finally treated recursively.
+
+# Install
+
+With [npm](http://npmjs.org) do:
+```
+npm i --save auto-change-description
+```
+
+# Use
+
+```
+const acd = require('auto-change-description');
+var results = acd.describe(before, after);
+```
 
 #### Example
 
