@@ -1,0 +1,24 @@
+{
+	"name": "auto-change-description",
+	"version": "0.0.1",
+	"description": "JSON Auto Change Description",
+	"homepage": "https://github.com/cope/auto-change-description#readme",
+	"author": "Predrag Stojadinovic <predrag@stojadinovic.net>",
+	"license": "UNLICENSED",
+	"main": "index.js",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/cope/auto-change-description.git"
+	},
+	"bugs": {
+		"url": "https://github.com/cope/auto-change-description/issues"
+	},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"dependencies": {
+		"deep-diff": "^0.3.8",
+		"deep-equal": "^1.0.1",
+		"lodash": "^4.17.4"
+	}
+}
