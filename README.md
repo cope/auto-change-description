@@ -1,4 +1,4 @@
-# auto-change-description
+# auto-change-description [![Build Status](https://travis-ci.org/cope/auto-change-description.svg?branch=master)](https://travis-ci.org/cope/auto-change-description)
 
 This simple library compares two JSONs and lists the differences found as changes.
 
