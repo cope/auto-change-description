@@ -10,7 +10,7 @@ module.exports = {
 	describe: describe
 };
 
-const convertValue = value => _.isString(value) ? value : JSON.stringify(value);
+const convertValue = value => value ? _.isString(value) ? value : JSON.stringify(value) : '-';
 
 const createNewRoot = (root = '') => _.size(root) > 0 ? root += '.' : root + '';
 
@@ -19,9 +19,12 @@ const sortDifference = difference => convertDifference(difference, _.join(differ
 function describe(before, after, root) {
 	let descriptions = process(before, after, root);
 
-	let deletions = _.filter(descriptions, [type, 'delete']);
-	let creates = _.filter(descriptions, [type, 'create']);
-	let edits = _.filter(descriptions, [type, 'modify']);
+	let errors = _.filter(descriptions, _.isString);
+	if (_.size(errors) > 0) return errors;
+
+	let deletions = _.filter(descriptions, ['type', 'delete']);
+	let creates = _.filter(descriptions, ['type', 'create']);
+	let edits = _.filter(descriptions, ['type', 'modify']);
 
 	let results = [];
 	_.forEach(deletions, difference => results.push('Deleted {' + difference.path + '} with value (' + difference.value + ').'));
@@ -37,7 +40,7 @@ function process(before, after, root = '') {
 		return ['Comparing arrays with non-arrays is not allowed.'];
 	}
 
-	if (_.isArray(after) && _.isArray(before)) {
+	if (_.isArray(before) && _.isArray(after)) {
 		return ['Changed  from (' + convertValue(before) + ') to (' + convertValue(after) + ').'];
 	}
 
@@ -67,7 +70,7 @@ function process(before, after, root = '') {
 
 function extractArrays(parent) {
 	let myArrays = {};
-	_.forEach(parent, value, key => {
+	_.forEach(parent, (value, key) => {
 		if (_.isArray(value)) myArrays[key] = value;
 	});
 	return myArrays;
@@ -75,7 +78,7 @@ function extractArrays(parent) {
 
 function extractObjects(parent) {
 	let mzObjects = {};
-	_.forEach(parent, value, key => {
+	_.forEach(parent, (value, key) => {
 		if (_.isPlainObject(value)) mzObjects[key] = value;
 	});
 	return mzObjects;
@@ -92,7 +95,7 @@ function processArrays(beforeArrays, afterArrays, root) {
 	_.forEach(created, item => results.push({path: newRoot + item, type: 'create', value: convertValue(afterArrays[item])}));
 
 	beforeArrays = _.omit(beforeArrays, deleted);
-	_.forEach(beforeArrays, beforeArray, key => {
+	_.forEach(beforeArrays, (beforeArray, key) => {
 		let afterArray = afterArrays[key];
 		if (afterArray && !deepEqual(beforeArray, afterArray)) {
 			results.push({path: newRoot + key, type: 'modify', from: convertValue(beforeArray), to: convertValue(afterArray)});
@@ -112,7 +115,7 @@ function processObjects(beforeObjects, afterObjects, root) {
 	_.forEach(created, item => results.push({path: item, type: 'create', value: convertValue(afterObjects[item])}));
 
 	beforeObjects = _.omit(beforeObjects, deleted);
-	_.forEach(beforeObjects, beforeObject, key => {
+	_.forEach(beforeObjects, (beforeObject, key) => {
 		let afterObject = afterObjects[key];
 		if (afterObject && !deepEqual(beforeObject, afterObject)) {
 			results = _.concat(results, process(beforeObject, afterObject, newRoot + key));
