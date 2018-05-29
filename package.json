@@ -14,7 +14,8 @@
 		"url": "https://github.com/cope/auto-change-description/issues"
 	},
 	"scripts": {
-		"test": "nyc --reporter=html mocha"
+		"test": "nyc --reporter=html mocha",
+		"analyze": "sonarjs -e .sonarlint/**,node_modules/**,coverage/**,.nyc_output/**"
 	},
 	"dependencies": {
 		"deep-diff": "^0.3.8",
@@ -24,6 +25,7 @@
 	"devDependencies": {
 		"chai": "^4.1.2",
 		"mocha": "^5.0.0",
-		"nyc": "^11.4.1"
+		"nyc": "^11.4.1",
+		"sonarjs": "^1.0.0"
 	}
 }
