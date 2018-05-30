@@ -16,7 +16,7 @@
 	},
 	"scripts": {
 		"test": "nyc --reporter=html mocha",
-		"analyze": "sonarjs -e .sonarlint/**,node_modules/**,coverage/**,.nyc_output/**"
+		"sonar": "sonarjs -e .sonarlint/**,node_modules/**,coverage/**,.nyc_output/**"
 	},
 	"dependencies": {
 		"deep-diff": "^0.3.8",
