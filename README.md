@@ -1,4 +1,7 @@
-# auto-change-description [![Build Status](https://travis-ci.org/cope/auto-change-description.svg?branch=master)](https://travis-ci.org/cope/auto-change-description)
+# auto-change-description
+[![Build Status](https://travis-ci.org/cope/auto-change-description.svg?branch=master)](https://travis-ci.org/cope/auto-change-description)
+[![coverage](https://coveralls.io/repos/github/cope/auto-change-description/badge.svg?branch=master)](https://coveralls.io/github/cope/auto-change-description?branch=master)
+[![npm](https://img.shields.io/npm/dt/auto-change-description.svg)](https://www.npmjs.com/package/auto-change-description)
 
 This simple library compares two JSONs and lists the differences found as changes.
 
