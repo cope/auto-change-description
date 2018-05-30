@@ -7,15 +7,15 @@
 	"license": "UNLICENSED",
 	"main": "index.js",
 	"repository": {
-		"test": "nyc --reporter=lcov --reporter=html mocha",
-		"coveralls": "cat ./coverage/lcov.info | node node_modules/.bin/coveralls",
+		"type": "git",
 		"url": "git+https://github.com/cope/auto-change-description.git"
 	},
 	"bugs": {
 		"url": "https://github.com/cope/auto-change-description/issues"
 	},
 	"scripts": {
-		"test": "nyc --reporter=html mocha",
+		"test": "nyc --reporter=lcov --reporter=html mocha",
+		"coveralls": "cat ./coverage/lcov.info | node node_modules/.bin/coveralls",
 		"sonar": "sonarjs -e .sonarlint/**,node_modules/**,coverage/**,.nyc_output/**"
 	},
 	"dependencies": {
