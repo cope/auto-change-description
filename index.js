@@ -10,23 +10,43 @@ const convertValue = (value) => value ? _.isString(value) ? value : JSON.stringi
 
 const createNewRoot = (root = "") => _.size(root) > 0 ? root += "." : root + "";
 
+function convertDifference(difference, path) {
+	if ("N" !== difference.kind) difference.before = difference.lhs;
+	if ("D" !== difference.kind) difference.after = difference.rhs;
+
+	if ("D" === difference.kind) return {path, type: "delete", value: convertValue(difference.before)};
+	else if ("N" === difference.kind) return {path, type: "create", value: convertValue(difference.after)};
+	else if ("E" === difference.kind) return {path, type: "modify", from: convertValue(difference.before), to: convertValue(difference.after)};
+
+	return difference;
+}
+
 const sortDifference = (difference) => convertDifference(difference, _.join(difference.path, "."));
 
-function describe(before, after, root) {
-	let descriptions = process(before, after, root);
-
-	let errors = _.filter(descriptions, _.isString);
-	if (_.size(errors) > 0) return errors;
-
-	let deletions = _.filter(descriptions, ["type", "delete"]);
-	let creates = _.filter(descriptions, ["type", "create"]);
-	let edits = _.filter(descriptions, ["type", "modify"]);
-
+function processArrays(beforeArrays, afterArrays, root) {
 	let results = [];
-	_.forEach(deletions, (difference) => results.push("Deleted {" + difference.path + "} with value (" + difference.value + ")."));
-	_.forEach(creates, (difference) => results.push("Created {" + difference.path + "} with value (" + difference.value + ")."));
-	_.forEach(edits, (difference) => results.push("Modified {" + difference.path + "} from (" + difference.from + ") to (" + difference.to + ")."));
+	let newRoot = createNewRoot(root);
+
+	let deleted = _.keys(_.omit(beforeArrays, _.keys(afterArrays)));
+	let created = _.keys(_.omit(afterArrays, _.keys(beforeArrays)));
+
+	_.forEach(deleted, (item) => results.push({path: newRoot + item, type: "delete", value: convertValue(beforeArrays[item])}));
+	_.forEach(created, (item) => results.push({path: newRoot + item, type: "create", value: convertValue(afterArrays[item])}));
+
+	beforeArrays = _.omit(beforeArrays, deleted);
+	_.forEach(beforeArrays, (beforeArray, key) => {
+		let afterArray = afterArrays[key];
+		if (afterArray && !deepEqual(beforeArray, afterArray)) results.push({path: newRoot + key, type: "modify", from: convertValue(beforeArray), to: convertValue(afterArray)});
+	});
 	return results;
+}
+
+function extractObjects(parent) {
+	let myObjects = {};
+	_.forEach(parent, (value, key) => {
+		if (_.isPlainObject(value)) myObjects[key] = value;
+	});
+	return myObjects;
 }
 
 function process(before, after, root = "") {
@@ -60,40 +80,29 @@ function process(before, after, root = "") {
 	return _.concat(results, arrResults, objResults);
 }
 
+function describe(before, after, root) {
+	let descriptions = process(before, after, root);
+
+	let errors = _.filter(descriptions, _.isString);
+	if (_.size(errors) > 0) return errors;
+
+	let deletions = _.filter(descriptions, ["type", "delete"]);
+	let creates = _.filter(descriptions, ["type", "create"]);
+	let edits = _.filter(descriptions, ["type", "modify"]);
+
+	let results = [];
+	_.forEach(deletions, (difference) => results.push("Deleted {" + difference.path + "} with value (" + difference.value + ")."));
+	_.forEach(creates, (difference) => results.push("Created {" + difference.path + "} with value (" + difference.value + ")."));
+	_.forEach(edits, (difference) => results.push("Modified {" + difference.path + "} from (" + difference.from + ") to (" + difference.to + ")."));
+	return results;
+}
+
 function extractArrays(parent) {
 	let myArrays = {};
 	_.forEach(parent, (value, key) => {
 		if (_.isArray(value)) myArrays[key] = value;
 	});
 	return myArrays;
-}
-
-function extractObjects(parent) {
-	let myObjects = {};
-	_.forEach(parent, (value, key) => {
-		if (_.isPlainObject(value)) myObjects[key] = value;
-	});
-	return myObjects;
-}
-
-function processArrays(beforeArrays, afterArrays, root) {
-	let results = [];
-	let newRoot = createNewRoot(root);
-
-	let deleted = _.keys(_.omit(beforeArrays, _.keys(afterArrays)));
-	let created = _.keys(_.omit(afterArrays, _.keys(beforeArrays)));
-
-	_.forEach(deleted, (item) => results.push({path: newRoot + item, type: "delete", value: convertValue(beforeArrays[item])}));
-	_.forEach(created, (item) => results.push({path: newRoot + item, type: "create", value: convertValue(afterArrays[item])}));
-
-	beforeArrays = _.omit(beforeArrays, deleted);
-	_.forEach(beforeArrays, (beforeArray, key) => {
-		let afterArray = afterArrays[key];
-		if (afterArray && !deepEqual(beforeArray, afterArray)) {
-			results.push({path: newRoot + key, type: "modify", from: convertValue(beforeArray), to: convertValue(afterArray)});
-		}
-	});
-	return results;
 }
 
 function processObjects(beforeObjects, afterObjects, root) {
@@ -114,17 +123,6 @@ function processObjects(beforeObjects, afterObjects, root) {
 	return results;
 }
 
-function convertDifference(difference, path) {
-	if ("N" !== difference.kind) difference.before = difference.lhs;
-	if ("D" !== difference.kind) difference.after = difference.rhs;
-
-	if ("D" === difference.kind) return {path: path, type: "delete", value: convertValue(difference.before)};
-	else if ("N" === difference.kind) return {path: path, type: "create", value: convertValue(difference.after)};
-	else if ("E" === difference.kind) return {path: path, type: "modify", from: convertValue(difference.before), to: convertValue(difference.after)};
-
-	return difference;
-}
-
 module.exports = {
-	describe: describe
+	describe
 };
