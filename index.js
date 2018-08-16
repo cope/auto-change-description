@@ -49,6 +49,32 @@ function extractObjects(parent) {
 	return myObjects;
 }
 
+function extractArrays(parent) {
+	let myArrays = {};
+	_.forEach(parent, (value, key) => {
+		if (_.isArray(value)) myArrays[key] = value;
+	});
+	return myArrays;
+}
+
+function processObjects(beforeObjects, afterObjects, root) {
+	let results = [];
+	let newRoot = createNewRoot(root);
+
+	let deleted = _.keys(_.omit(beforeObjects, _.keys(afterObjects)));
+	let created = _.keys(_.omit(afterObjects, _.keys(beforeObjects)));
+
+	_.forEach(deleted, (item) => results.push({path: item, type: "delete", value: convertValue(beforeObjects[item])}));
+	_.forEach(created, (item) => results.push({path: item, type: "create", value: convertValue(afterObjects[item])}));
+
+	beforeObjects = _.omit(beforeObjects, deleted);
+	_.forEach(beforeObjects, (beforeObject, key) => {
+		let afterObject = afterObjects[key];
+		if (afterObject && !deepEqual(beforeObject, afterObject)) results = _.concat(results, process(beforeObject, afterObject, newRoot + key));
+	});
+	return results;
+}
+
 function process(before, after, root = "") {
 	if (deepEqual(before, after)) return ["No changes."];
 
@@ -94,32 +120,6 @@ function describe(before, after, root) {
 	_.forEach(deletions, (difference) => results.push("Deleted {" + difference.path + "} with value (" + difference.value + ")."));
 	_.forEach(creates, (difference) => results.push("Created {" + difference.path + "} with value (" + difference.value + ")."));
 	_.forEach(edits, (difference) => results.push("Modified {" + difference.path + "} from (" + difference.from + ") to (" + difference.to + ")."));
-	return results;
-}
-
-function extractArrays(parent) {
-	let myArrays = {};
-	_.forEach(parent, (value, key) => {
-		if (_.isArray(value)) myArrays[key] = value;
-	});
-	return myArrays;
-}
-
-function processObjects(beforeObjects, afterObjects, root) {
-	let results = [];
-	let newRoot = createNewRoot(root);
-
-	let deleted = _.keys(_.omit(beforeObjects, _.keys(afterObjects)));
-	let created = _.keys(_.omit(afterObjects, _.keys(beforeObjects)));
-
-	_.forEach(deleted, (item) => results.push({path: item, type: "delete", value: convertValue(beforeObjects[item])}));
-	_.forEach(created, (item) => results.push({path: item, type: "create", value: convertValue(afterObjects[item])}));
-
-	beforeObjects = _.omit(beforeObjects, deleted);
-	_.forEach(beforeObjects, (beforeObject, key) => {
-		let afterObject = afterObjects[key];
-		if (afterObject && !deepEqual(beforeObject, afterObject)) results = _.concat(results, process(beforeObject, afterObject, newRoot + key));
-	});
 	return results;
 }
 
