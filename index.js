@@ -20,9 +20,6 @@ function convertDifference(difference, path) {
 		E: {path, type: "modify", from: convertValue(difference.before), to: convertValue(difference.after)},
 	};
 	let ret = _.get(rets, difference.kind);
-	// if ("D" === difference.kind) return {path, type: "delete", value: convertValue(difference.before)};
-	// else if ("N" === difference.kind) return {path, type: "create", value: convertValue(difference.after)};
-	// else if ("E" === difference.kind) return {path, type: "modify", from: convertValue(difference.before), to: convertValue(difference.after)};
 
 	return ret ? ret : difference;
 }
@@ -70,12 +67,12 @@ function processObjects(beforeObjects, afterObjects, root) {
 	let deleted = _.keys(_.omit(beforeObjects, _.keys(afterObjects)));
 	let created = _.keys(_.omit(afterObjects, _.keys(beforeObjects)));
 
-	_.forEach(deleted, (item) => results.push({path: item, type: "delete", value: convertValue(beforeObjects[item])}));
-	_.forEach(created, (item) => results.push({path: item, type: "create", value: convertValue(afterObjects[item])}));
+	_.forEach(deleted, (item) => results.push({path: item, type: "delete", value: convertValue(_.get(beforeObjects, item))}));
+	_.forEach(created, (item) => results.push({path: item, type: "create", value: convertValue(_.get(afterObjects, item))}));
 
 	beforeObjects = _.omit(beforeObjects, deleted);
 	_.forEach(beforeObjects, (beforeObject, key) => {
-		let afterObject = afterObjects[key];
+		let afterObject = _.get(afterObjects, key);
 		if (afterObject && !deepEqual(beforeObject, afterObject)) results = _.concat(results, process(beforeObject, afterObject, newRoot + key));
 	});
 	return results;
