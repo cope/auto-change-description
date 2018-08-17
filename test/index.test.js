@@ -15,7 +15,7 @@ let tests = [
 	}, {
 		before: ["a"],
 		after: ["b"],
-		response: "Changed  from ([\"a\"]) to ([\"b\"])."
+		response: "Changed from ([\"a\"]) to ([\"b\"])."
 	}, {
 		before: {
 			name: "my object",
@@ -54,7 +54,7 @@ describe("AutoChangeDescription tests", function () {
 
 	describe("AutoChangeDescription.describe tests", function () {
 		_.forEach(tests, (test) => {
-			it("describe should return  " + test.response, function () {
+			it("describe should return " + test.response, function () {
 				let response = AutoChangeDescription.describe(test.before, test.after);
 				response = _.trim(_.join(response, " "));
 				expect(response).to.be.equal(test.response);

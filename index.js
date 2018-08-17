@@ -80,13 +80,16 @@ function processObjects(beforeObjects, afterObjects, root) {
 
 const nonMatchingArrays = (b, a) => (_.isArray(b) && !_.isArray(a)) || (_.isArray(a) && !_.isArray(b));
 const bothArrays = (b, a) => _.isArray(b) && _.isArray(a);
+const noNeedToCompare = (b, a) => {
+	if (deepEqual(b, a)) return ["No changes."];
+	if (nonMatchingArrays(b, a)) return ["Comparing arrays with non-arrays is not allowed."];
+	if (bothArrays(b, a)) return ["Changed from (" + convertValue(b) + ") to (" + convertValue(a) + ")."];
+	return null;
+};
 
 function process(before, after, root = "") {
-	if (deepEqual(before, after)) return ["No changes."];
-
-	if (nonMatchingArrays(before, after)) return ["Comparing arrays with non-arrays is not allowed."];
-
-	if (bothArrays(before, after)) return ["Changed  from (" + convertValue(before) + ") to (" + convertValue(after) + ")."];
+	let noNeed = noNeedToCompare(before, after);
+	if (noNeed) return noNeed;
 
 	let beforeArrays = extractArrays(before);
 	before = _.omit(before, _.keys(beforeArrays));
