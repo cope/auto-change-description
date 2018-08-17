@@ -14,11 +14,17 @@ function convertDifference(difference, path) {
 	if ("N" !== difference.kind) difference.before = difference.lhs;
 	if ("D" !== difference.kind) difference.after = difference.rhs;
 
-	if ("D" === difference.kind) return {path, type: "delete", value: convertValue(difference.before)};
-	else if ("N" === difference.kind) return {path, type: "create", value: convertValue(difference.after)};
-	else if ("E" === difference.kind) return {path, type: "modify", from: convertValue(difference.before), to: convertValue(difference.after)};
+	let rets = {
+		D: {path, type: "delete", value: convertValue(difference.before)},
+		N: {path, type: "create", value: convertValue(difference.after)},
+		E: {path, type: "modify", from: convertValue(difference.before), to: convertValue(difference.after)},
+	};
+	let ret = _.get(rets, difference.kind);
+	// if ("D" === difference.kind) return {path, type: "delete", value: convertValue(difference.before)};
+	// else if ("N" === difference.kind) return {path, type: "create", value: convertValue(difference.after)};
+	// else if ("E" === difference.kind) return {path, type: "modify", from: convertValue(difference.before), to: convertValue(difference.after)};
 
-	return difference;
+	return ret ? ret : difference;
 }
 
 const sortDifference = (difference) => convertDifference(difference, _.join(difference.path, "."));
