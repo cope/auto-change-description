@@ -30,12 +30,12 @@ function processArrays(beforeArrays, afterArrays, root) {
 	let deleted = _.keys(_.omit(beforeArrays, _.keys(afterArrays)));
 	let created = _.keys(_.omit(afterArrays, _.keys(beforeArrays)));
 
-	_.forEach(deleted, (item) => results.push({path: newRoot + item, type: "delete", value: convertValue(beforeArrays[item])}));
-	_.forEach(created, (item) => results.push({path: newRoot + item, type: "create", value: convertValue(afterArrays[item])}));
+	_.forEach(deleted, (item) => results.push({path: newRoot + item, type: "delete", value: convertValue(_.get(beforeArrays, item))}));
+	_.forEach(created, (item) => results.push({path: newRoot + item, type: "create", value: convertValue(_.get(afterArrays, item))}));
 
 	beforeArrays = _.omit(beforeArrays, deleted);
 	_.forEach(beforeArrays, (beforeArray, key) => {
-		let afterArray = afterArrays[key];
+		let afterArray = _.get(afterArrays, key);
 		if (afterArray && !deepEqual(beforeArray, afterArray)) results.push({path: newRoot + key, type: "modify", from: convertValue(beforeArray), to: convertValue(afterArray)});
 	});
 	return results;
@@ -44,7 +44,7 @@ function processArrays(beforeArrays, afterArrays, root) {
 function extractObjects(parent) {
 	let myObjects = {};
 	_.forEach(parent, (value, key) => {
-		if (_.isPlainObject(value)) myObjects[key] = value;
+		if (_.isPlainObject(value)) _.set(myObjects, key, value);
 	});
 	return myObjects;
 }
@@ -52,7 +52,7 @@ function extractObjects(parent) {
 function extractArrays(parent) {
 	let myArrays = {};
 	_.forEach(parent, (value, key) => {
-		if (_.isArray(value)) myArrays[key] = value;
+		if (_.isArray(value)) _.set(myArrays, key, value);
 	});
 	return myArrays;
 }
