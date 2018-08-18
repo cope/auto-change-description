@@ -60,7 +60,16 @@ function extractArrays(parent) {
 	return myArrays;
 }
 
-function processObjects(beforeObjects, afterObjects, root) {
+const nonMatchingArrays = (b, a) => (_.isArray(b) && !_.isArray(a)) || (_.isArray(a) && !_.isArray(b));
+const bothArrays = (b, a) => _.isArray(b) && _.isArray(a);
+const noNeedToCompare = (b, a) => {
+	if (deepEqual(b, a)) return ["No changes."];
+	if (nonMatchingArrays(b, a)) return ["Comparing arrays with non-arrays is not allowed."];
+	if (bothArrays(b, a)) return ["Changed from (" + convertValue(b) + ") to (" + convertValue(a) + ")."];
+	return null;
+};
+
+function processObjects(beforeObjects, afterObjects, root, processMethod) {
 	let results = [];
 	let newRoot = createNewRoot(root);
 
@@ -73,19 +82,10 @@ function processObjects(beforeObjects, afterObjects, root) {
 	beforeObjects = _.omit(beforeObjects, deleted);
 	_.forEach(beforeObjects, (beforeObject, key) => {
 		let afterObject = _.get(afterObjects, key);
-		if (afterObject && !deepEqual(beforeObject, afterObject)) results = _.concat(results, process(beforeObject, afterObject, newRoot + key));
+		if (afterObject && !deepEqual(beforeObject, afterObject)) results = _.concat(results, processMethod(beforeObject, afterObject, newRoot + key));
 	});
 	return results;
 }
-
-const nonMatchingArrays = (b, a) => (_.isArray(b) && !_.isArray(a)) || (_.isArray(a) && !_.isArray(b));
-const bothArrays = (b, a) => _.isArray(b) && _.isArray(a);
-const noNeedToCompare = (b, a) => {
-	if (deepEqual(b, a)) return ["No changes."];
-	if (nonMatchingArrays(b, a)) return ["Comparing arrays with non-arrays is not allowed."];
-	if (bothArrays(b, a)) return ["Changed from (" + convertValue(b) + ") to (" + convertValue(a) + ")."];
-	return null;
-};
 
 function process(before, after, root = "") {
 	let noNeed = noNeedToCompare(before, after);
@@ -105,7 +105,7 @@ function process(before, after, root = "") {
 	let afterObjects = extractObjects(after);
 	after = _.omit(after, _.keys(afterObjects));
 
-	let objResults = processObjects(beforeObjects, afterObjects, root);
+	let objResults = processObjects(beforeObjects, afterObjects, root, process);
 
 	// Process the rest
 	let results = [];
