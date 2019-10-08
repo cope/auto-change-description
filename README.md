@@ -3,7 +3,7 @@
 [![codacy](https://img.shields.io/codacy/grade/699db0a812494db3b674123551f74a61.svg)](https://www.codacy.com/project/cope/auto-change-description/dashboard)
 [![coverage](https://img.shields.io/coveralls/github/cope/auto-change-description/master.svg)](https://coveralls.io/github/cope/auto-change-description?branch=master)
 [![dependencies](https://david-dm.org/cope/auto-change-description.svg)](https://www.npmjs.com/package/auto-change-description)
-[![npm](https://img.shields.io/npm/dt/auto-change-description.svg)](https://www.npmjs.com/package/auto-change-description)
+[![npm](https://img.shields.io/npm/dt/auto-change-description.svg)](https://www.npmjs.com/package/auto-change-description) [![Greenkeeper badge](https://badges.greenkeeper.io/cope/auto-change-description.svg)](https://greenkeeper.io/)
 
 This simple library compares two JSONs and lists the differences found as changes.
 
