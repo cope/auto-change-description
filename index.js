@@ -1,6 +1,9 @@
 "use strict";
 
+require("json-circular-stringify");
+
 const _ = require("lodash");
+
 const deepDiff = require("deep-diff").diff;
 const deepEqual = require("deep-equal");
 

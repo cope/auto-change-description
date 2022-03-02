@@ -1,6 +1,6 @@
 {
 	"name": "auto-change-description",
-	"version": "1.0.6",
+	"version": "1.0.7",
 	"description": "JSON Auto Change Description",
 	"homepage": "https://github.com/cope/auto-change-description#readme",
 	"author": "Predrag Stojadinovic <predrag@stojadinovic.net>",
@@ -23,12 +23,13 @@
 	"dependencies": {
 		"deep-diff": "^1.0.2",
 		"deep-equal": "^2.0.5",
+		"json-circular-stringify": "^1.0.1",
 		"lodash": "^4.17.21"
 	},
 	"devDependencies": {
 		"chai": "^4.3.6",
 		"coveralls": "^3.1.1",
-		"mocha": "^9.2.0",
+		"mocha": "^9.2.1",
 		"nyc": "^15.1.0",
 		"sonarjs": "^1.0.0"
 	}
